@@ -5,5 +5,6 @@
 int main()
 {
 	VulkanRenderer *renderer = new VulkanRenderer();
+	delete renderer;
 	return 0;
 }
