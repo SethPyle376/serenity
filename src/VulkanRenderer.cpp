@@ -8,9 +8,22 @@ VulkanRenderer::~VulkanRenderer() {
     if (enableValidationLayers) {
         vkDestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
     }
-    vkDestroyInstance(instance, nullptr);
+    vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyDevice(device, nullptr);
+    vkDestroyInstance(instance, nullptr);
     SDL_DestroyWindow(window);
+}
+
+bool VulkanRenderer::init() {
+    initWindow();
+    volkInitialize();
+    initInstance();
+    volkLoadInstance(instance);
+    initDebugMessenger();
+    initSurface();
+    pickPhysicalDevice();
+    initLogicalDevice();
+    return true;
 }
 
 bool VulkanRenderer::checkValidationLayerSupport() {
@@ -74,21 +87,26 @@ std::vector<const char*> VulkanRenderer::getRequiredExtensions() {
     return extensions;
 }
 
-QueueFamilyIndices VulkanRenderer::findQueueFamilies(VkPhysicalDevice device) {
+QueueFamilyIndices VulkanRenderer::findQueueFamilies(VkPhysicalDevice hDevice) {
     std::cout << "ENGINE: FINDING QUEUE FAMILIES" << std::endl;
     QueueFamilyIndices indices;
 
     uint32_t queueFamilyCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+    vkGetPhysicalDeviceQueueFamilyProperties(hDevice, &queueFamilyCount, nullptr);
 
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+    vkGetPhysicalDeviceQueueFamilyProperties(hDevice, &queueFamilyCount, queueFamilies.data());
 
+    VkBool32 presentSupport = false;
     int i = 0;
-
     for (const auto& queueFamily: queueFamilies) {
+        vkGetPhysicalDeviceSurfaceSupportKHR(hDevice, i, surface, &presentSupport);
         if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
             indices.graphicsFamily = i;
+        }
+
+        if (queueFamily.queueCount > 0 && presentSupport) {
+            indices.presentFamily = i;
         }
 
         if (indices.isComplete()) {
@@ -118,17 +136,6 @@ void VulkanRenderer::initDebugMessenger() {
     if (vkCreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
         throw std::runtime_error("ERROR: FAILED TO INITIALIZE DEBUG MESSENGER");
     }
-}
-
-bool VulkanRenderer::init() {
-    initWindow();
-    volkInitialize();
-    initInstance();
-    volkLoadInstance(instance);
-    initDebugMessenger();
-    pickPhysicalDevice();
-    initLogicalDevice();
-    return true;
 }
 
 void VulkanRenderer::initWindow() {
@@ -215,20 +222,25 @@ void VulkanRenderer::initLogicalDevice() {
 
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
-    VkDeviceQueueCreateInfo queueCreateInfo = {};
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
-    queueCreateInfo.queueCount = 1;
-
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
     float queuePriority = 1.0f;
-    queueCreateInfo.pQueuePriorities = &queuePriority;
-    
+
+    for (uint32_t queueFamily : uniqueQueueFamilies) {
+        VkDeviceQueueCreateInfo queueCreateInfo = {};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueCreateInfos.push_back(queueCreateInfo);
+    }
+
     VkPhysicalDeviceFeatures deviceFeatures = {};
 
     VkDeviceCreateInfo createInfo = {};
     createInfo.sType= VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    createInfo.pQueueCreateInfos = &queueCreateInfo;
-    createInfo.queueCreateInfoCount = 1;
+    createInfo.pQueueCreateInfos = queueCreateInfos.data();
+    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
     createInfo.pEnabledFeatures = &deviceFeatures;
 
     if (enableValidationLayers) {
@@ -245,4 +257,14 @@ void VulkanRenderer::initLogicalDevice() {
     }
 
     vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
+    vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
+}
+
+void VulkanRenderer::initSurface() {
+    std::cout << "ENGINE: CREATING VULKAN SURFACE" << std::endl;
+    if (SDL_Vulkan_CreateSurface(window, instance, &surface) != SDL_TRUE) {
+        throw std::runtime_error("ERROR: COULD NOT INITIALIZE VULKAN SURFACE");
+    } else {
+        std::cout << "ENGINE: VULKAN SURFACE INITIALIZED" << std::endl;
+    }
 }

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <set>
 #include <optional>
 
 #include "Renderer.h"
@@ -16,9 +17,10 @@
 
 struct QueueFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
+    std::optional<uint32_t> presentFamily;
     
     bool isComplete() {
-        return graphicsFamily.has_value();
+        return graphicsFamily.has_value() && presentFamily.has_value();
     }
 };
 
@@ -30,6 +32,8 @@ private:
     VkPhysicalDevice physicalDevice;
     VkDevice device;
     VkQueue graphicsQueue;
+    VkQueue presentQueue;
+    VkSurfaceKHR surface;
 
     VkDebugUtilsMessengerEXT debugMessenger;
 
@@ -44,6 +48,7 @@ private:
     void initDebugMessenger();
     void pickPhysicalDevice();
     void initLogicalDevice();
+    void initSurface();
 
     bool checkValidationLayerSupport();
     std::vector<const char *> getRequiredExtensions();
