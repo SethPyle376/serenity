@@ -5,15 +5,15 @@ VulkanRenderer::VulkanRenderer() {
 }
 
 VulkanRenderer::~VulkanRenderer() {
-    // if (enableValidationLayers) {
-    //     vkDestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
-    // }
+    if (enableValidationLayers) {
+        vkDestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+    }
     vkDestroyInstance(instance, nullptr);
     SDL_DestroyWindow(window);
 }
 
 bool VulkanRenderer::checkValidationLayerSupport() {
-    std::cout << "VERIFYING VALIDATION LAYER SUPPORT" << std::endl;
+    std::cout << "ENGINE: VERIFYING VALIDATION LAYER SUPPORT" << std::endl;
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
@@ -32,8 +32,25 @@ bool VulkanRenderer::checkValidationLayerSupport() {
         if (!layerFound)
             return false;
     }
-    std::cout << "VALIDATION LAYER SUPPORT VERIFIED" << std::endl;
+    std::cout << "ENGINE: VALIDATION LAYER SUPPORT VERIFIED" << std::endl;
     return true;
+}
+
+bool VulkanRenderer::isDeviceSuitable(VkPhysicalDevice device) {
+        VkPhysicalDeviceProperties deviceProperties;
+        vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
+        VkPhysicalDeviceFeatures deviceFeatures;
+        vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+        QueueFamilyIndices indices = findQueueFamilies(device);
+
+        std::cout << "ENGINE: CHECKING IF DEVICE IS SUITABLE" << std::endl;
+
+        std::cout << "ENGINE: " << deviceProperties.deviceName << std::endl;
+
+        return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && 
+            deviceFeatures.geometryShader && indices.isComplete();
 }
 
 std::vector<const char*> VulkanRenderer::getRequiredExtensions() {
@@ -47,13 +64,41 @@ std::vector<const char*> VulkanRenderer::getRequiredExtensions() {
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
 
-    std::cout << "REQUIRED EXTENSIONS: " << std::endl;
+    std::cout << "ENGINE: REQUIRED EXTENSIONS: " << std::endl;
 
     for (const char* extension : extensions) {
-        std::cout << "EXTENSION: " << extension << std::endl;
+        std::cout << "ENGINE: EXTENSION: " << extension << std::endl;
     }
 
     return extensions;
+}
+
+QueueFamilyIndices VulkanRenderer::findQueueFamilies(VkPhysicalDevice device) {
+    std::cout << "ENGINE: FINDING QUEUE FAMILIES" << std::endl;
+    QueueFamilyIndices indices;
+
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+    int i = 0;
+
+    for (const auto& queueFamily: queueFamilies) {
+        if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            indices.graphicsFamily = i;
+        }
+
+        if (indices.isComplete()) {
+            break;
+        }
+        i++;
+    }
+    if (indices.isComplete()) {
+        std::cout << "ENGINE: QUEUE FAMILIES FOUND" << std::endl;
+    }
+    return indices;
 }
 
 void VulkanRenderer::initDebugMessenger() {
@@ -78,6 +123,7 @@ bool VulkanRenderer::init() {
     initWindow();
     initVolk();
     initDebugMessenger();
+    pickPhysicalDevice();
     return true;
 }
 
@@ -130,6 +176,34 @@ void VulkanRenderer::initInstance() {
         throw std::runtime_error("ERROR: FAILED TO CREATE VULKAN INSTANCE");
     }
     std::cout << "VULKAN INSTANCE INITIALIZED" << std::endl;
+}
+
+void VulkanRenderer::pickPhysicalDevice()
+{
+    std::cout << "ENGINE: PICKING PHYSICAL DEVICE" << std::endl;
+    //TODO: Consider scoring system to get best gpu.
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+
+    if (deviceCount == 0) {
+        throw std::runtime_error("ERROR: FAILED TO FIND GPUS WITH VULKAN SUPPORT");
+    }
+
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+
+    for (const auto& device : devices) {
+        if (isDeviceSuitable(device)) {
+            physicalDevice = device;
+            break;
+        }
+    }
+
+    if (physicalDevice == VK_NULL_HANDLE) {
+        throw std::runtime_error("ERROR: FAILED TO FIND SUITABLE GPU");
+    } else {
+        std::cout << "ENGINE: PHYSICAL DEVICE SELECTED" << std::endl;
+    }
 }
 
 void VulkanRenderer::initVolk() {

@@ -1,6 +1,7 @@
+set(CMAKE_CXX_STANDARD 17)
 cmake_minimum_required (VERSION 2.6)
 project (Application)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -ldl")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -ldl")
 include_directories(include)
 
 set(SDL2_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/sdl/include")
