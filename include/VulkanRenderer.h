@@ -28,6 +28,8 @@ private:
 
     VkInstance instance;
     VkPhysicalDevice physicalDevice;
+    VkDevice device;
+    VkQueue graphicsQueue;
 
     VkDebugUtilsMessengerEXT debugMessenger;
 
@@ -41,6 +43,7 @@ private:
     void initInstance();
     void initDebugMessenger();
     void pickPhysicalDevice();
+    void initLogicalDevice();
 
     bool checkValidationLayerSupport();
     std::vector<const char *> getRequiredExtensions();
