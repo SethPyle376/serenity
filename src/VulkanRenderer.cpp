@@ -50,7 +50,24 @@ bool VulkanRenderer::checkValidationLayerSupport() {
     return true;
 }
 
+bool VulkanRenderer::checkDeviceExtensionSupport(VkPhysicalDevice device) {
+    uint32_t extensionCount;
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+    std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+    std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+    for (const auto& extension : availableExtensions) {
+        requiredExtensions.erase(extension.extensionName);
+    }
+    
+    return requiredExtensions.empty();
+}
+
 bool VulkanRenderer::isDeviceSuitable(VkPhysicalDevice device) {
+        std::cout << "ENGINE: CHECKING IF DEVICE IS SUITABLE" << std::endl;
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
@@ -59,12 +76,10 @@ bool VulkanRenderer::isDeviceSuitable(VkPhysicalDevice device) {
 
         QueueFamilyIndices indices = findQueueFamilies(device);
 
-        std::cout << "ENGINE: CHECKING IF DEVICE IS SUITABLE" << std::endl;
-
         std::cout << "ENGINE: " << deviceProperties.deviceName << std::endl;
 
         return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && 
-            deviceFeatures.geometryShader && indices.isComplete();
+            deviceFeatures.geometryShader && indices.isComplete() && checkDeviceExtensionSupport(device);
 }
 
 std::vector<const char*> VulkanRenderer::getRequiredExtensions() {

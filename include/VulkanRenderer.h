@@ -41,6 +41,10 @@ private:
         "VK_LAYER_LUNARG_standard_validation"
     };
 
+    const std::vector<const char*> deviceExtensions = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    };
+
     bool init();
     void initWindow();
     void initVolk();
@@ -51,6 +55,7 @@ private:
     void initSurface();
 
     bool checkValidationLayerSupport();
+    bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     std::vector<const char *> getRequiredExtensions();
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
     bool isDeviceSuitable(VkPhysicalDevice device);
