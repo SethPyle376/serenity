@@ -20,7 +20,9 @@ if (UNIX)
 target_link_libraries(Application ${CMAKE_DL_LIBS})
 endif (UNIX)
 
+if (WIN32)
 set(SDL2_LIBRARIES "${CMAKE_CURRENT_LIST_DIR}/sdl/lib/x64/SDL2.lib;${CMAKE_CURRENT_LIST_DIR}/sdl/lib/x64/SDL2main.lib")
+endif (WIN32)
 
 target_link_libraries(Application ${SDL2_LIBRARIES})
 
