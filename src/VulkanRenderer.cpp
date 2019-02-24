@@ -247,6 +247,12 @@ void VulkanRenderer::initWindow() {
         HEIGHT,
         SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN
 	);
+
+    if (window == NULL) {
+        std::cout << SDL_GetError() << std::endl;
+    }
+
+    return;
 }
 
 void VulkanRenderer::initInstance() {
