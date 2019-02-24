@@ -2,12 +2,16 @@
 #include <vector>
 #include <set>
 #include <optional>
+#include <algorithm>
 
 #include "Renderer.h"
 
 #include "SDL.h"
 #include "SDL_vulkan.h"
 #include "volk.h"
+
+#define WIDTH 640
+#define HEIGHT 480
 
 #ifdef NDEBUG
     const bool enableValidationLayers = false;
@@ -24,6 +28,12 @@ struct QueueFamilyIndices {
     }
 };
 
+struct SwapChainSupportDetails {
+    VkSurfaceCapabilitiesKHR capabilities;
+    std::vector<VkSurfaceFormatKHR> formats;
+    std::vector<VkPresentModeKHR> presentModes;
+};
+
 class VulkanRenderer : public Renderer {
 private:
     SDL_Window *window;
@@ -34,6 +44,12 @@ private:
     VkQueue graphicsQueue;
     VkQueue presentQueue;
     VkSurfaceKHR surface;
+    VkSwapchainKHR swapChain;
+
+    //Swap chain/surface option selection
+    VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+    VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes);
+    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
     VkDebugUtilsMessengerEXT debugMessenger;
 
@@ -45,6 +61,10 @@ private:
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
 
+    std::vector<VkImage> swapChainImages;
+    VkFormat swapChainImageFormat;
+    VkExtent2D swapChainExtent;
+
     bool init();
     void initWindow();
     void initVolk();
@@ -53,12 +73,14 @@ private:
     void pickPhysicalDevice();
     void initLogicalDevice();
     void initSurface();
+    void initSwapChain();
 
     bool checkValidationLayerSupport();
     bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     std::vector<const char *> getRequiredExtensions();
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
     bool isDeviceSuitable(VkPhysicalDevice device);
+    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
