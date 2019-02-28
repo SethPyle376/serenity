@@ -6,6 +6,8 @@
 
 #include "Renderer.h"
 
+#include "VulkanUtility.h"
+
 #include "SDL.h"
 #include "SDL_vulkan.h"
 #include "volk.h"
@@ -45,11 +47,14 @@ private:
     VkQueue presentQueue;
     VkSurfaceKHR surface;
     VkSwapchainKHR swapChain;
+    VkPipelineLayout pipelineLayout;
 
     //Swap chain/surface option selection
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes);
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
+    VkShaderModule createShaderModule(const std::vector<char>& code);
 
     VkDebugUtilsMessengerEXT debugMessenger;
 
@@ -62,6 +67,7 @@ private:
     };
 
     std::vector<VkImage> swapChainImages;
+    std::vector<VkImageView> swapChainImageViews;
     VkFormat swapChainImageFormat;
     VkExtent2D swapChainExtent;
 
@@ -74,6 +80,9 @@ private:
     void initLogicalDevice();
     void initSurface();
     void initSwapChain();
+    void initImageViews();
+
+    void createGraphicsPipeline();
 
     bool checkValidationLayerSupport();
     bool checkDeviceExtensionSupport(VkPhysicalDevice device);
