@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 2.6)
 project (Application)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -ldl")
 include_directories(include)
+include_directories(include/Engine/renderer)
 
 set(SDL2_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/sdl/include")
 
