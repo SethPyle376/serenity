@@ -1,5 +1,4 @@
-#include "SDL.h"
-#include "VulkanRenderer.h"
+#include "Engine/Renderer/VulkanRenderer.h"
 #undef main
 
 int main()

@@ -12,9 +12,10 @@ endif (UNIX)
 include_directories(${SDL2_INCLUDE_DIRS})
 
 file(GLOB MAINSOURCES src/*.cpp)
-file(GLOB SOURCE src/*.c)
+file(GLOB SUBSOURCES src/*/*/*.cpp)
+file(GLOB SOURCE src/*/*/*.c)
 
-add_executable(Application ${SOURCE} ${MAINSOURCES})
+add_executable(Application ${SOURCE} ${MAINSOURCES} ${SUBSOURCES})
 
 if (UNIX)
 target_link_libraries(Application ${CMAKE_DL_LIBS})
