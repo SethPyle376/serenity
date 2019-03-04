@@ -1,9 +1,7 @@
-#include "Engine/Renderer/VulkanRenderer.h"
-#undef main
+#include "Engine/Application/Application.h"
 
 int main()
 {
-	VulkanRenderer *renderer = new VulkanRenderer();
-	delete renderer;
+	Application application;
 	return 0;
 }
