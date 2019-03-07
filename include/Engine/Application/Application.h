@@ -12,10 +12,6 @@ public:
     Application() {
         resourceManager = new ResourceManager();
         entityManager = new EntityManager();
-
-        for (int i = 0; i < 5; i++) {
-            entityManager->createEntity();
-        }
     }
 
     ~Application() {
