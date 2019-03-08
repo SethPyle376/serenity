@@ -13,4 +13,5 @@ private:
 public:
     ComponentManager();
     void insertComponent(Component *component);
+    std::vector<Component*> getComponents(std::string type);
 };
