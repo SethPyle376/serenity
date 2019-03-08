@@ -39,10 +39,10 @@ public:
         componentManager->insertComponent(&testComponent);
         componentManager->insertComponent(&testComponentTwo);
 
-        Service service;
+        Service *service = new Service();
         serviceManager->addService(service);
 
-        TestService testService;
+        TestService *testService = new TestService();
         serviceManager->addService(testService);
 
         serviceManager->process();
