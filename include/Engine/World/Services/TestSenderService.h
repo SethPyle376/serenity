@@ -17,9 +17,9 @@ public:
 
     virtual void process(Node *node) {
         Event event;
-        event.emitter = node;
+        event.emitterId = node->getId();
         event.type = "test";
-        event.nodeId = targetNode;
+        event.targetId = targetNode;
         EventManager::dispatch(event);
         std::cout << "NODE ID: " << node->getId() << " DISPATCHING TO NODE " << targetNode << std::endl;
     }

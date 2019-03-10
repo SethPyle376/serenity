@@ -10,6 +10,7 @@
 #include "Engine/World/Nodes/TestSenderNode.h"
 
 class NodeManager {
+friend class Node;
 private:
     int count;
     EntityManager *entityManager;
@@ -23,5 +24,8 @@ public:
     int create(int entityId, std::string type);
     std::vector<Node*> getNodes(std::string type) {
         return nodes[type];
+    }
+    Node* getById(int id) {
+        return nodeList[id];
     }
 };

@@ -6,7 +6,7 @@
 
 struct Event {
     int id;
-    int nodeId;
+    int targetId;
     std::string type;
-    Node *emitter;
+    int emitterId;
 };

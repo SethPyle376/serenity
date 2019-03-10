@@ -20,7 +20,7 @@ public:
     static std::vector<Event> getEvents(std::string type, int nodeId) {
         std::vector<Event> returnVector;
         for (int i = 0; i < eventList[type].size(); i++) {
-            if (eventList[type][i].nodeId == nodeId) {
+            if (eventList[type][i].targetId == nodeId) {
                 returnVector.push_back(eventList[type][i]);
                 eventList[type].erase(eventList[type].begin() + i);
             }

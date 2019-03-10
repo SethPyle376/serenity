@@ -27,7 +27,7 @@ public:
         nodeManager->create(entity, "testSender");
 
         TestSenderService *testSenderService = new TestSenderService(receiver);
-        TestReceiverService *testReceiverService = new TestReceiverService();
+        TestReceiverService *testReceiverService = new TestReceiverService(nodeManager);
 
         serviceManager->addService(testReceiverService);
         serviceManager->addService(testSenderService);

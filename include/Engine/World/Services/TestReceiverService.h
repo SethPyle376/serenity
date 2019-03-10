@@ -9,9 +9,10 @@
 
 class TestReceiverService : public Service {
 private:
-
+    NodeManager *nodeManager;
 public:
-    TestReceiverService() {
+    TestReceiverService(NodeManager *nodeManager) {
+        this->nodeManager = nodeManager;
         nodeType = typeid(TestReceiverNode).name();
     }
 
@@ -20,7 +21,7 @@ public:
         std::vector<Event> events = EventManager::getEvents("test", receiverNode->getId());
         for (int i = 0; i < events.size(); i++) {
             std::cout << "NODE ID: " << node->getId() << " RECEIVED EVENT ID: " << events[i].id << " FROM NODE ID: " 
-                                    << events[i].emitter->getId() << " OF TYPE " 
+                                    << nodeManager->getById(events[i].emitterId)->getId() << " OF TYPE " 
                                     << events[i].type << std::endl;
         }
     }
