@@ -4,7 +4,8 @@
 #include "Engine/World/EntityManager.h"
 #include "Engine/World/ServiceManager.h"
 
-#include "Engine/World/Services/TestService.h"
+#include "Engine/World/Services/TestSenderService.h"
+#include "Engine/World/Services/TestReceiverService.h"
 
 class Application {
 private:
@@ -12,9 +13,7 @@ private:
     EntityManager *entityManager;
     NodeManager *nodeManager;
     ServiceManager *serviceManager;
-    TestService *testService;
     
-
 public:
     Application() {
         resourceManager = new ResourceManager();
@@ -24,12 +23,18 @@ public:
 
         int entity = entityManager->createEntity();
 
-        nodeManager->create(entity, "test");
+        int receiver = nodeManager->create(entity, "testReceiver");
+        nodeManager->create(entity, "testSender");
 
-        TestService *testService = new TestService();
-        serviceManager->addService(testService);
+        TestSenderService *testSenderService = new TestSenderService(receiver);
+        TestReceiverService *testReceiverService = new TestReceiverService();
 
-        serviceManager->process();
+        serviceManager->addService(testReceiverService);
+        serviceManager->addService(testSenderService);
+
+        for (int i = 0; i < 5; i++) {
+            serviceManager->process();
+        }
 
         return;
     }

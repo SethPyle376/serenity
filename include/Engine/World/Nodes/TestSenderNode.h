@@ -4,7 +4,7 @@
 
 #include "Engine/World/Components/TestComponent.h"
 
-class TestNode : public Node {
+class TestSenderNode : public Node {
 private:
     TestComponent *testComponent;
 public:

@@ -6,17 +6,21 @@
 #include "Entity.h"
 
 #include "Engine/World/EntityManager.h"
-#include "Engine/World/Nodes/TestNode.h"
+#include "Engine/World/Nodes/TestReceiverNode.h"
+#include "Engine/World/Nodes/TestSenderNode.h"
 
 class NodeManager {
 private:
+    int count;
     EntityManager *entityManager;
+    std::vector<Node*> nodeList;
     std::map<std::string, std::vector<Node*>> nodes;
 public:
     NodeManager(EntityManager *entityManager){
         this->entityManager = entityManager;
+        count = 0;
     };
-    void create(int entityId, std::string type);
+    int create(int entityId, std::string type);
     std::vector<Node*> getNodes(std::string type) {
         return nodes[type];
     }
