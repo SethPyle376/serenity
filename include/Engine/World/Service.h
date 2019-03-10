@@ -3,18 +3,18 @@
 #include <string>
 
 #include "ServiceManager.h"
-#include "Component.h"
+#include "Node.h"
 
 class Service {
 friend class ServiceManager;
 protected:
-    std::string componentType;
+    std::string nodeType;
 public:
     Service(){
-        componentType = typeid(Component).name();
+        nodeType = typeid(Node).name();
     };
 
-    virtual void process(Component *component) {
-        std::cout << component->getId() << std::endl;
+    virtual void process(Node *node) {
+        std::cout << "PROCESSING NODE" << std::endl;
     }
 };

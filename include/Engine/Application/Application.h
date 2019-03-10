@@ -2,10 +2,7 @@
 
 #include "Engine/ResourceManager/ResourceManager.h"
 #include "Engine/World/EntityManager.h"
-#include "Engine/World/ComponentManager.h"
 #include "Engine/World/ServiceManager.h"
-
-#include "Engine/World/Components/TestComponent.h"
 
 #include "Engine/World/Services/TestService.h"
 
@@ -13,9 +10,8 @@ class Application {
 private:
     ResourceManager *resourceManager;
     EntityManager *entityManager;
-    ComponentManager *componentManager;
+    NodeManager *nodeManager;
     ServiceManager *serviceManager;
-
     TestService *testService;
     
 
@@ -23,24 +19,12 @@ public:
     Application() {
         resourceManager = new ResourceManager();
         entityManager = new EntityManager();
-        componentManager = new ComponentManager();
-        serviceManager = new ServiceManager(componentManager);
+        nodeManager = new NodeManager(entityManager);
+        serviceManager = new ServiceManager(nodeManager);
 
-        Component component;
-        component.setId(69);
+        int entity = entityManager->createEntity();
 
-        TestComponent testComponent;
-        testComponent.setId(420);
-
-        TestComponent testComponentTwo;
-        testComponentTwo.setId(421);
-
-        componentManager->insertComponent(&component);
-        componentManager->insertComponent(&testComponent);
-        componentManager->insertComponent(&testComponentTwo);
-
-        Service *service = new Service();
-        serviceManager->addService(service);
+        nodeManager->create(entity, "test");
 
         TestService *testService = new TestService();
         serviceManager->addService(testService);
@@ -52,7 +36,7 @@ public:
 
     ~Application() {
         delete serviceManager;
-        delete componentManager;
+        delete nodeManager;
         delete entityManager;
         delete resourceManager;
     }

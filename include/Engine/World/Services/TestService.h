@@ -3,15 +3,15 @@
 #include <iostream>
 
 #include "Engine/World/Service.h"
-#include "Engine/World/Components/TestComponent.h"
+#include "Engine/World/Nodes/TestNode.h"
 
 class TestService : public Service {
 public:
     TestService() {
-        componentType = typeid(TestComponent).name();
+        nodeType = typeid(TestNode).name();
     }
 
-    virtual void process(Component *component) {
-        std::cout << component->getId() << " called from child" << std::endl;
+    virtual void process(Node *node) {
+        std::cout << "Processing test node: " << ((TestNode*)node)->getComponentData() << std::endl;
     }
 };

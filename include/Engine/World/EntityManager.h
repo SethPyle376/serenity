@@ -7,10 +7,11 @@
 class EntityManager {
 private:
     int count;
-    std::vector<Entity> entityList;
-
+    std::vector<Entity*> entityList;
 public:
     EntityManager();
     int createEntity();
     int getEntityCount();
+
+    Entity *getById(int count);
 };

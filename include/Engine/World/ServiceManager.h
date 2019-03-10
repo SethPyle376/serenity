@@ -4,16 +4,15 @@
 #include <string>
 
 #include "Service.h"
+#include "NodeManager.h"
 
 class ServiceManager {
 private:
-
-    ComponentManager *componentManager;
-
+    NodeManager *nodeManager;
     std::vector<Service*> serviceList;
 public:
-    ServiceManager(ComponentManager *componentManager) {
-        this->componentManager = componentManager;
+    ServiceManager(NodeManager *nodeManager) {
+        this->nodeManager = nodeManager;
     };
 
     void addService(Service *service) {
@@ -22,9 +21,10 @@ public:
 
     void process() {
         for (int i = 0; i < serviceList.size(); i++) {
-            std::vector<Component*> components = componentManager->getComponents(serviceList[i]->componentType);
-            for (int j = 0; j < components.size(); j++) {
-                serviceList[i]->process(components[j]);
+            std::string type = serviceList[i]->nodeType;
+            std::vector<Node*> nodes = nodeManager->getNodes(type);
+            for (int j = 0; j < nodes.size(); j++) {
+                serviceList[i]->process(nodes[j]);
             }
         }
     }
