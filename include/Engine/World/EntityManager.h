@@ -9,18 +9,22 @@
 class EntityManager {
 private:
     int count;
-    std::vector<bool> entityList;
+    std::vector<Entity*> entityList;
 public:
     int createEntity() {
         count++;
         for (int i = 0; i < entityList.capacity(); i++) {
-            if (!entityList[i]) {
-                entityList[i] = true;
+            if (entityList[i] == nullptr) {
+                entityList[i] = new Entity(i);
                 return i;
             }
         }
-        entityList.push_back(true);
+        entityList.push_back(new Entity(entityList.capacity() - 1));
         return entityList.capacity() - 1;
+    }
+
+    void addComponent(Component *component) {
+        entityList[component->getEntityId()]->addComponent(component);
     }
 
     void deleteEntity(int entity) {
@@ -30,5 +34,9 @@ public:
 
     int getEntityCount() {
         return count;
+    }
+
+    Entity* getEntity(int id) {
+        return entityList[id];
     }
 };

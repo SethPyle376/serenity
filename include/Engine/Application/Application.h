@@ -9,6 +9,9 @@
 #include "Engine/World/Components/TestComponent.h"
 #include "Engine/World/Services/TestService.h"
 
+#include "Engine/World/Components/DependentComponent.h"
+#include "Engine/World/Services/DependentService.h"
+
 class Application {
 private:
     ResourceManager *resourceManager;
@@ -31,9 +34,11 @@ public:
 
         serviceManager->addService(new Service());
         serviceManager->addService(new TestService());
+        serviceManager->addService(new DependentService());
         componentManager->registerComponent(new Component(testEntity));
         componentManager->registerComponent(new Component(testEntity));
         componentManager->registerComponent(new TestComponent(testEntity));
+        componentManager->registerComponent(new DependentComponent(testEntity, entityManager));
 
         for(int i = 0; i < 4; i++) {
             serviceManager->process();

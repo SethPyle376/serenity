@@ -20,5 +20,13 @@ public:
         return id;
     }
 
+    int getEntityId() {
+        return entityId;
+    }
+
+    std::string getType() {
+        return type;
+    }
+    
     virtual ~Component() {};
 };
