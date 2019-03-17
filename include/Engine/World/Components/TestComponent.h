@@ -3,9 +3,17 @@
 #include "Engine/World/Component.h"
 
 class TestComponent : public Component {
+private:
+    int testValue;
 public:
-    ~TestComponent() {};
-    int getId() {
-        return 17;
+    TestComponent(int entityId) {
+        this->entityId = entityId;
+        type = "test";
+        testValue = 69;
     }
+
+    int getValue() {
+        return testValue;
+    }
+
 };

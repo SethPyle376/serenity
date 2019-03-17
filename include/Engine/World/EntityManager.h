@@ -4,14 +4,31 @@
 
 #include "Entity.h"
 
+#define MAX_ENTITIES 100000
+
 class EntityManager {
 private:
     int count;
-    std::vector<Entity*> entityList;
+    std::vector<bool> entityList;
 public:
-    EntityManager();
-    int createEntity();
-    int getEntityCount();
+    int createEntity() {
+        count++;
+        for (int i = 0; i < entityList.capacity(); i++) {
+            if (!entityList[i]) {
+                entityList[i] = true;
+                return i;
+            }
+        }
+        entityList.push_back(true);
+        return entityList.capacity() - 1;
+    }
 
-    Entity *getById(int count);
+    void deleteEntity(int entity) {
+        entityList[entity] = false;
+        count--;
+    }
+
+    int getEntityCount() {
+        return count;
+    }
 };

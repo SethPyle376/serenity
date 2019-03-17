@@ -1,20 +1,24 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 
 #include "ServiceManager.h"
-#include "Node.h"
 
 class Service {
 friend class ServiceManager;
 protected:
-    std::string nodeType;
+    std::string componentType;
 public:
-    Service(){
-        nodeType = typeid(Node).name();
-    };
+    Service() {
+        componentType = "default";
+    }
 
-    virtual void process(Node *node) {
-        std::cout << "PROCESSING NODE" << std::endl;
+    virtual void process(Component *component) {
+        std::cout << "DEFAULT COMPONENT: " << component->getId() << std::endl;
+    }
+
+    virtual void processEvent(Component *component, Event event) {
+        std::cout << "PROCESSED EVENT: " << event.id << " DATA: " << event.data << std::endl; 
     }
 };

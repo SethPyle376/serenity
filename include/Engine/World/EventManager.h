@@ -2,7 +2,7 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include <queue>
 
 #include "Event.h"
 
@@ -11,23 +11,19 @@ private:
     
 public:
     static int count;
-    static std::map<std::string, std::vector<Event>> eventList;
+    static std::map<std::string, std::map<int, std::queue<Event>>> eventList;
+
     static void dispatch(Event event) {
         event.id = count++;
-        eventList[event.type].push_back(event);
+        eventList[event.componentType][event.targetId].push(event);
     }
 
-    static std::vector<Event> getEvents(std::string type, int nodeId) {
-        std::vector<Event> returnVector;
-        for (int i = 0; i < eventList[type].size(); i++) {
-            if (eventList[type][i].targetId == nodeId) {
-                returnVector.push_back(eventList[type][i]);
-                eventList[type].erase(eventList[type].begin() + i);
-            }
-        }
-        return returnVector;
+    static std::queue<Event> getEvents(std::string type, int nodeId) {
+        std::queue<Event> eventQueue = eventList[type][nodeId];
+        eventList[type][nodeId] = std::queue<Event>();
+        return eventQueue;
     }
 };
 
 int EventManager::count = 0;
-std::map<std::string, std::vector<Event>> EventManager::eventList = {};
+std::map<std::string, std::map<int, std::queue<Event>>> EventManager::eventList = {};

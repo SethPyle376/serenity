@@ -4,16 +4,19 @@
 #include <string>
 
 #include "Service.h"
-#include "NodeManager.h"
+#include "ComponentManager.h"
+#include "EventManager.h"
 
 class ServiceManager {
 private:
-    NodeManager *nodeManager;
     std::vector<Service*> serviceList;
+    ComponentManager *componentManager;
+    EventManager *eventManager;
 public:
-    ServiceManager(NodeManager *nodeManager) {
-        this->nodeManager = nodeManager;
-    };
+    ServiceManager(ComponentManager *componentManager, EventManager *eventManager) {
+        this->componentManager = componentManager;
+        this->eventManager = eventManager;
+    }
 
     void addService(Service *service) {
         serviceList.push_back(service);
@@ -21,10 +24,14 @@ public:
 
     void process() {
         for (int i = 0; i < serviceList.size(); i++) {
-            std::string type = serviceList[i]->nodeType;
-            std::vector<Node*> nodes = nodeManager->getNodes(type);
-            for (int j = 0; j < nodes.size(); j++) {
-                serviceList[i]->process(nodes[j]);
+            std::map<int, Component*> components = componentManager->getByType(serviceList[i]->componentType);
+            for (auto componentPair : components) {
+                serviceList[i]->process(componentPair.second);
+                std::queue eventQueue = eventManager->getEvents(serviceList[i]->componentType, componentPair.second->getId());
+                while (!eventQueue.empty()) {
+                    serviceList[i]->processEvent(componentPair.second, eventQueue.front());
+                    eventQueue.pop();
+                }
             }
         }
     }

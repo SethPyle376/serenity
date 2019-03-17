@@ -1,48 +1,47 @@
 #pragma once
 
-#include "Engine/ResourceManager/ResourceManager.h"
+#include "Engine/World/ComponentManager.h"
 #include "Engine/World/EntityManager.h"
+#include "Engine/World/EventManager.h"
 #include "Engine/World/ServiceManager.h"
+#include "Engine/ResourceManager/ResourceManager.h"
 
-#include "Engine/World/Services/TestSenderService.h"
-#include "Engine/World/Services/TestReceiverService.h"
+#include "Engine/World/Components/TestComponent.h"
+#include "Engine/World/Services/TestService.h"
 
 class Application {
 private:
     ResourceManager *resourceManager;
-    EntityManager *entityManager;
-    NodeManager *nodeManager;
+    ComponentManager *componentManager;
     ServiceManager *serviceManager;
+    EventManager *eventManager;
+    EntityManager *entityManager;
     
 public:
     Application() {
-        resourceManager = new ResourceManager();
         entityManager = new EntityManager();
-        nodeManager = new NodeManager(entityManager);
-        serviceManager = new ServiceManager(nodeManager);
+        componentManager = new ComponentManager();
+        eventManager = new EventManager();
+        serviceManager = new ServiceManager(componentManager, eventManager);
+        return;
+    }
 
-        int entity = entityManager->createEntity();
+    void process() {
+        int testEntity = entityManager->createEntity();
 
-        int receiver = nodeManager->create(entity, "testReceiver");
-        nodeManager->create(entity, "testSender");
+        serviceManager->addService(new Service());
+        serviceManager->addService(new TestService());
+        componentManager->registerComponent(new Component(testEntity));
+        componentManager->registerComponent(new Component(testEntity));
+        componentManager->registerComponent(new TestComponent(testEntity));
 
-        TestSenderService *testSenderService = new TestSenderService(receiver);
-        TestReceiverService *testReceiverService = new TestReceiverService(nodeManager);
-
-        serviceManager->addService(testReceiverService);
-        serviceManager->addService(testSenderService);
-
-        for (int i = 0; i < 5; i++) {
+        for(int i = 0; i < 4; i++) {
             serviceManager->process();
         }
-
         return;
     }
 
     ~Application() {
-        delete serviceManager;
-        delete nodeManager;
-        delete entityManager;
-        delete resourceManager;
+
     }
 };
