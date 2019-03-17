@@ -28,7 +28,7 @@ public:
     }
 
     void deleteEntity(int entity) {
-        entityList[entity] = false;
+        entityList[entity] = nullptr;
         count--;
     }
 
