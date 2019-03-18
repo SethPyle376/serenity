@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Engine/World/Component.h"
 
 #define CHUNK_SIZE 32

@@ -12,6 +12,9 @@
 #include "Engine/World/Components/DependentComponent.h"
 #include "Engine/World/Services/DependentService.h"
 
+#include "Engine/World/Components/MapComponent.h"
+#include "Engine/World/Services/MapGenService.h"
+
 class Application {
 private:
     ResourceManager *resourceManager;
@@ -35,10 +38,12 @@ public:
         serviceManager->addService(new Service());
         serviceManager->addService(new TestService());
         serviceManager->addService(new DependentService());
+        serviceManager->addService(new MapGenService(componentManager));
         componentManager->registerComponent(new Component(testEntity));
         componentManager->registerComponent(new Component(testEntity));
         componentManager->registerComponent(new TestComponent(testEntity));
         componentManager->registerComponent(new DependentComponent(testEntity, entityManager));
+        componentManager->registerComponent(new MapComponent());
 
         for(int i = 0; i < 4; i++) {
             serviceManager->process();
